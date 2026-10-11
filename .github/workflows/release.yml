@@ -1,0 +1,51 @@
+name: Release plugin package
+
+# Se dispara al hacer push de un tag de version (v0.1.0, v1.2.3...).
+# Requisito: haber ejecutado "python3 tools/release.py X.Y.Z" ANTES de taggear,
+# y haber commiteado install.xml, public.xml y dist/bubbleskin-X.Y.Z.zip.
+# Asi el zip que se publica es byte-identico al que se uso para calcular el
+# SHA-1 de public.xml.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar que el paquete de la release existe y su SHA-1 coincide con public.xml
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          VERSION="${VERSION#v}"
+          ZIP="dist/bubbleskin-${VERSION}.zip"
+          if [ ! -f "$ZIP" ]; then
+            echo "ERROR: no existe $ZIP."
+            echo "Ejecuta 'python3 tools/release.py ${VERSION}' y commitea dist/ antes de taggear."
+            exit 1
+          fi
+          ZIP_SHA=$(sha1sum "$ZIP" | cut -d' ' -f1)
+          XML_SHA=$(python3 -c "import re; print(re.search(r'<sha>([0-9a-f]{40})</sha>', open('public.xml').read()).group(1))")
+          echo "zip sha1:  $ZIP_SHA"
+          echo "xml sha1:  $XML_SHA"
+          [ "$ZIP_SHA" = "$XML_SHA" ] || { echo "ERROR: los SHA-1 no coinciden"; exit 1; }
+          grep -q "<version>${VERSION}</version>" BubbleSkin/install.xml \
+            || { echo "ERROR: install.xml no tiene version ${VERSION}"; exit 1; }
+          echo "Verificacion OK"
+
+      - name: Crear GitHub Release y adjuntar el zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          gh release create "${GITHUB_REF_NAME}" \
+            "dist/bubbleskin-${VERSION}.zip" \
+            --title "BubbleSkin ${VERSION}" \
+            --generate-notes
