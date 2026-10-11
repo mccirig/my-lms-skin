@@ -1,0 +1,11 @@
+[% PROCESS settings/header.html %]
+
+	[% WRAPPER setting title="PLUGIN_BUBBLE_SKIN_ALBUMS_PAGE_SIZE" desc="PLUGIN_BUBBLE_SKIN_ALBUMS_PAGE_SIZE_DESC" %]
+		<input type="text" class="stdedit sliderInput_5_100_5" name="pref_albumsPageSize" id="albumsPageSize" value="[% prefs.pref_albumsPageSize | html %]" size="3">
+	[% END %]
+
+	[% WRAPPER setting title="PLUGIN_BUBBLE_SKIN_ACCENT_COLOR" desc="PLUGIN_BUBBLE_SKIN_ACCENT_COLOR_DESC" %]
+		<input type="text" class="stdedit" name="pref_accentColor" id="accentColor" value="[% prefs.pref_accentColor | html %]" size="10">
+	[% END %]
+
+[% PROCESS settings/footer.html %]

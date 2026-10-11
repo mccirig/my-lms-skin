@@ -1,0 +1,27 @@
+BUBBLE_SKIN
+	EN	Bubble Skin
+	ES	Bubble Skin
+
+PLUGIN_BUBBLE_SKIN
+	EN	Example SPA skin for LMS, used as a learning scaffold.
+	ES	Skin SPA de ejemplo para LMS, usado como andamiaje de aprendizaje.
+
+PLUGIN_BUBBLE_SKIN_SETTINGS
+	EN	Bubble Skin settings
+	ES	Ajustes de Bubble Skin
+
+PLUGIN_BUBBLE_SKIN_ALBUMS_PAGE_SIZE
+	EN	Albums per page
+	ES	Álbumes por página
+
+PLUGIN_BUBBLE_SKIN_ALBUMS_PAGE_SIZE_DESC
+	EN	How many albums to show when browsing the library.
+	ES	Cuántos álbumes mostrar al navegar la biblioteca.
+
+PLUGIN_BUBBLE_SKIN_ACCENT_COLOR
+	EN	Accent color
+	ES	Color de acento
+
+PLUGIN_BUBBLE_SKIN_ACCENT_COLOR_DESC
+	EN	CSS color used for buttons and highlights (e.g. #3b82f6).
+	ES	Color CSS usado en botones y destacados (p. ej. #3b82f6).

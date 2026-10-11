@@ -1,0 +1,7 @@
+---
+# Herencia de plantillas: si una página no existe en "bubble", se busca en
+# "Default" y al final siempre en el skin base "EN" (ver docs/02).
+# Gracias a esto, las páginas de ajustes del servidor se ven decentes aunque
+# nuestro skin sea una SPA que solo define index.html.
+skinparents:
+ - Default

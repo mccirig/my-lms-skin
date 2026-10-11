@@ -1,0 +1,17 @@
+<?xml version='1.0' standalone='yes'?>
+<extensions>
+  <id>d41b8a93-e29d-42e7-8c45-a933509e7a99</id>
+  <module>Plugins::BubbleSkin::Plugin</module>
+  <description>PLUGIN_BUBBLE_SKIN</description>
+  <creator>my-lms-skin</creator>
+  <icon>plugins/BubbleSkin/html/images/icon.svg</icon>
+  <version>DEVELOPMENT</version>
+  <defaultState>enabled</defaultState>
+  <type>2</type>
+  <targetApplication>
+    <minVersion>8.0.0</minVersion>
+    <maxVersion>*</maxVersion>
+    <id>SlimServer</id>
+  </targetApplication>
+  <name>BUBBLE_SKIN</name>
+</extensions>

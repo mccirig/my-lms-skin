@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>[% "BUBBLE_SKIN" | string %]</title>
+
+  <!-- webroot la inyecta el servidor (Template Toolkit).
+       Es "/" normalmente, o "/bubble/" cuando se accede vía /bubble/ -->
+  <link rel="stylesheet" href="[% webroot %]html/css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="logo">[% "BUBBLE_SKIN" | string %]</h1>
+    <select id="player" class="player-select" title="Reproductor"></select>
+  </header>
+
+  <main id="app">
+    <section class="nowplaying card">
+      <img id="cover" class="cover" alt="" src="">
+      <div class="track-meta">
+        <div id="track-title" class="track-title">&mdash;</div>
+        <div id="track-artist" class="track-artist"></div>
+        <div id="track-album" class="track-album"></div>
+        <div class="transport">
+          <button id="btn-prev" title="Anterior">&#x23EE;</button>
+          <button id="btn-play" title="Play/Pause">&#x25B6;</button>
+          <button id="btn-next" title="Siguiente">&#x23ED;</button>
+        </div>
+        <input id="volume" type="range" min="0" max="100" value="50" title="Volumen">
+      </div>
+    </section>
+
+    <section class="library card">
+      <h2 id="library-title">Biblioteca</h2>
+      <ul id="albums" class="albums"></ul>
+    </section>
+  </main>
+
+  <script src="[% webroot %]html/js/app.js"></script>
+</body>
+</html>
