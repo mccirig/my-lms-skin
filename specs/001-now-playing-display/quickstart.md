@@ -5,43 +5,18 @@ Sin framework de tests: checklist manual + gates de sintaxis (constitución VIII
 
 ## Prerrequisitos
 
-- LMS ≥ 8.0 en marcha con ≥ 1 reproductor (Squeezelite vale) y algo de música con carátula.
-- Instalación en desarrollo del plugin **en la máquina donde corre LMS** (este repo puede
-  vivir en otro equipo — el symlink solo tiene sentido en el servidor):
+- LMS ≥ 8.0 en marcha con ≥ 1 reproductor y algo de música con carátula.
+- **Flujo de desarrollo elegido (sin symlinks ni tocar el servidor/compose):** el desarrollo
+  ocurre en este repo; cada fase completa se publica en GitHub y se prueba **desde la UI de
+  LMS**, como haría un usuario final:
+  1. Primera vez: *Ajustes → Plugins → Repositorios adicionales* → añadir la URL de
+     `public.xml` de este repo → instalar *Bubble Skin*.
+  2. Cada iteración: cuando se publica una nueva versión (`tools/release.py` + tag + GitHub
+     Release), LMS la muestra como **actualización disponible** en *Ajustes → Plugins* →
+     actualizar (LMS pedirá reinicio al instalar plugins, confírmalo).
+  3. Ejecutar los escenarios E2E de la fase correspondiente (tabla abajo).
 
-  1. Localiza el *cache folder* del servidor en la propia UI:
-     LMS → *Ajustes → Información* → campo **"Carpeta de caché / Cache Folder"**
-     (en paquete Debian/Ubuntu suele ser `/var/lib/squeezeboxserver/cache`; en Docker,
-     piCorePlayer u otras instalaciones varía).
-  2. En **el servidor**: clona este repo y symlinkea el plugin:
-
-     ```bash
-     git clone https://github.com/mccirig/my-lms-skin.git && cd my-lms-skin
-     sudo ln -s "$PWD/BubbleSkin" "<CACHE_FOLDER>/InstalledPlugins/Plugins/BubbleSkin"
-     ```
-
-  3. Reinicia LMS con lo que corresponda a tu instalación —
-     `sudo systemctl restart lyrionmusicserver` (o `squeezeboxserver` /
-     `logitechmediaserver` según paquete), `docker restart <contenedor>`, o el control de
-     piCorePlayer. Compruébalo con `systemctl list-units | grep -i -E 'lyrion|squeeze'`.
-  4. Activa el plugin en *Ajustes → Plugins* si no lo estaba ya.
-
-- **Si LMS corre en contenedor Docker:** el symlink DEBE resolverse también *dentro* del
-  contenedor — un symlink del host a una ruta no mapeada queda roto para LMS. Receta:
-  clona el repo **dentro del volumen de configuración mapeado** (p. ej.
-  `<CONFIG>/dev/my-lms-skin`), aparca la copia instalada por repo renombrándola
-  (`mv <CACHE>/InstalledPlugins/Plugins/BubbleSkin …/BubbleSkin.repo-park` — reversible,
-  nada se borra), y crea un symlink **relativo**:
-  `ln -s ../../../dev/my-lms-skin/BubbleSkin <CACHE>/InstalledPlugins/Plugins/BubbleSkin`.
-  Al ser relativo y vivir todo bajo el volumen mapeado, vale igual en host y contenedor.
-  Evita `/tmp` para el clone (suele ser tmpfs: desaparece al reiniciar el host).
-
-- **Regla del ciclo de desarrollo:** tras editar JS/CSS/HTML de `HTML/bubble/html/` basta
-  recargar el navegador (assets estáticos, sin reinicio); tras editar cualquier `.pm`
-  REINICIA el servidor (los módulos Perl se cargan al arranque).
-- **Alternativa (probar releases tal como las ven los usuarios):** instala desde la URL del
-  repositorio en *Ajustes → Plugins* — como se hizo con la 0.1.0. Más lento para iterar,
-  pero es la vía que valida el mecanismo de distribución (SC-006).
+  Ventaja extra: cada prueba valida además el mecanismo de distribución real (SC-006).
 
 ## Gates de sintaxis (antes de probar nada)
 
