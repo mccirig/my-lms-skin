@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 build/
 .DS_Store
+
+# Dependencias Node instaladas localmente (p. ej. .opencode/node_modules del
+# plugin de spec-kit). package.json / package-lock.json SÍ se versionan.
+node_modules/
+
