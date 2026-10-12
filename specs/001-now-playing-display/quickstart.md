@@ -6,12 +6,32 @@ Sin framework de tests: checklist manual + gates de sintaxis (constitución VIII
 ## Prerrequisitos
 
 - LMS ≥ 8.0 en marcha con ≥ 1 reproductor (Squeezelite vale) y algo de música con carátula.
-- Plugin instalado en desarrollo:
+- Instalación en desarrollo del plugin **en la máquina donde corre LMS** (este repo puede
+  vivir en otro equipo — el symlink solo tiene sentido en el servidor):
 
-  ```bash
-  sudo ln -s "$PWD/BubbleSkin" /var/lib/squeezeboxserver/cache/InstalledPlugins/Plugins/BubbleSkin
-  sudo systemctl restart lyrionmusicserver
-  ```
+  1. Localiza el *cache folder* del servidor en la propia UI:
+     LMS → *Ajustes → Información* → campo **"Carpeta de caché / Cache Folder"**
+     (en paquete Debian/Ubuntu suele ser `/var/lib/squeezeboxserver/cache`; en Docker,
+     piCorePlayer u otras instalaciones varía).
+  2. En **el servidor**: clona este repo y symlinkea el plugin:
+
+     ```bash
+     git clone https://github.com/mccirig/my-lms-skin.git && cd my-lms-skin
+     sudo ln -s "$PWD/BubbleSkin" "<CACHE_FOLDER>/InstalledPlugins/Plugins/BubbleSkin"
+     ```
+
+  3. Reinicia LMS con lo que corresponda a tu instalación —
+     `sudo systemctl restart lyrionmusicserver` (o `squeezeboxserver` /
+     `logitechmediaserver` según paquete), `docker restart <contenedor>`, o el control de
+     piCorePlayer. Compruébalo con `systemctl list-units | grep -i -E 'lyrion|squeeze'`.
+  4. Activa el plugin en *Ajustes → Plugins* si no lo estaba ya.
+
+- **Regla del ciclo de desarrollo:** tras editar JS/CSS/HTML de `HTML/bubble/html/` basta
+  recargar el navegador (assets estáticos, sin reinicio); tras editar cualquier `.pm`
+  REINICIA el servidor (los módulos Perl se cargan al arranque).
+- **Alternativa (probar releases tal como las ven los usuarios):** instala desde la URL del
+  repositorio en *Ajustes → Plugins* — como se hizo con la 0.1.0. Más lento para iterar,
+  pero es la vía que valida el mecanismo de distribución (SC-006).
 
 ## Gates de sintaxis (antes de probar nada)
 
