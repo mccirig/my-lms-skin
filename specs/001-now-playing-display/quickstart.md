@@ -26,6 +26,16 @@ Sin framework de tests: checklist manual + gates de sintaxis (constitución VIII
      piCorePlayer. Compruébalo con `systemctl list-units | grep -i -E 'lyrion|squeeze'`.
   4. Activa el plugin en *Ajustes → Plugins* si no lo estaba ya.
 
+- **Si LMS corre en contenedor Docker:** el symlink DEBE resolverse también *dentro* del
+  contenedor — un symlink del host a una ruta no mapeada queda roto para LMS. Receta:
+  clona el repo **dentro del volumen de configuración mapeado** (p. ej.
+  `<CONFIG>/dev/my-lms-skin`), aparca la copia instalada por repo renombrándola
+  (`mv <CACHE>/InstalledPlugins/Plugins/BubbleSkin …/BubbleSkin.repo-park` — reversible,
+  nada se borra), y crea un symlink **relativo**:
+  `ln -s ../../../dev/my-lms-skin/BubbleSkin <CACHE>/InstalledPlugins/Plugins/BubbleSkin`.
+  Al ser relativo y vivir todo bajo el volumen mapeado, vale igual en host y contenedor.
+  Evita `/tmp` para el clone (suele ser tmpfs: desaparece al reiniciar el host).
+
 - **Regla del ciclo de desarrollo:** tras editar JS/CSS/HTML de `HTML/bubble/html/` basta
   recargar el navegador (assets estáticos, sin reinicio); tras editar cualquier `.pm`
   REINICIA el servidor (los módulos Perl se cargan al arranque).
