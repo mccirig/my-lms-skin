@@ -1,0 +1,15 @@
+{
+  "nothing_playing": "Nada en reproducción",
+  "paused": "En pausa",
+  "coming_up": "A continuación",
+  "no_player": "Reproductor no encontrado",
+  "no_player_available": "Reproductor no disponible",
+  "no_connection": "Sin conexión con el servidor",
+  "local": "Local",
+  "remote": "Remoto",
+  "kbps": "kbps",
+  "khz": "kHz",
+  "bit": " bits",
+  "unknown_album": "Álbum desconocido",
+  "unknown_artist": "Artista desconocido"
+}

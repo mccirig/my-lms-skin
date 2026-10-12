@@ -1,15 +1,12 @@
 package Plugins::BubbleSkin::Plugin;
 
 #
-# BubbleSkin - skin SPA de ejemplo para Lyrion Music Server (LMS)
+# BubbleSkin - pantalla "Now Playing" para display dedicado (kiosk) en LMS.
 #
-# Esqueleto educativo que acompaña a la guía en docs/. Demuestra:
-#   * skin registrado automáticamente por existir HTML/bubble
-#   * preferencias propias del plugin
-#   * página de ajustes (Settings.pm)
-#   * comando CLI propio consumible vía /jsonrpc.js
+# v1.0: una sola pantalla de solo lectura servida desde HTML/bubble/.
+# Backend minimo: solo preferencias propias y pagina de ajustes.
 #
-# Publicado como ejemplo libre (MIT).
+# MIT.
 #
 
 use strict;
@@ -39,39 +36,10 @@ sub initPlugin {
 		require Plugins::BubbleSkin::Settings;
 		Plugins::BubbleSkin::Settings->new();
 	}
-
-	$class->initCLI();
 }
 
 sub shutdownPlugin {
 	# Aquí iría la limpieza (desuscripciones, handlers, etc.)
-}
-
-# ---------------------------------------------------------------------------
-# Comando CLI propio: accesible vía JSON-RPC como ["bubbleskin", "hello", ...]
-#                                                               |requiere Player
-#                                                               |  |es Query
-#                                                               |  |  |tiene Tags
-#                                                               C  Q  T  F(unción)
-# ---------------------------------------------------------------------------
-sub initCLI {
-	Slim::Control::Request::addDispatch(['bubbleskin', 'hello', '_name'], [0, 0, 1, \&_cliHello]);
-}
-
-sub _cliHello {
-	my $request = shift;
-
-	if ($request->isNotCommand([['bubbleskin']])) {
-		$request->setStatusBadDispatch();
-		return;
-	}
-
-	my $name = $request->getParam('_name') || 'mundo';
-
-	$request->addResult('mensaje', "Hola, $name! (desde Plugins::BubbleSkin)");
-	$request->addResult('albumsPageSize', $prefs->get('albumsPageSize'));
-	$request->addResult('accentColor', $prefs->get('accentColor'));
-	$request->setStatusDone();
 }
 
 1;
