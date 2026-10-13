@@ -48,8 +48,15 @@ BUBBLE.cometdClient = (function () {
     }
 
     cometd = new org.cometd.CometD();
-    cometd.setMaxBackoff(10000); // máx. 10 s entre reintentos de reconexión
-    cometd.init({ url: '/cometd', logLevel: 'off' });
+    try {
+      // maxBackoff es un campo de configuración (máx. 10 s entre reintentos);
+      // init(config) = configure() + handshake()
+      cometd.init({ url: '/cometd', logLevel: 'off', maxBackoff: 10000 });
+    } catch (e) {
+      console.error('[bubbleskin] fallo al iniciar cometd', e);
+      emit('offline');
+      return false;
+    }
 
     cometd.addListener('/meta/handshake', function (message) {
       if (message.successful) {

@@ -62,18 +62,26 @@
       .catch(function () { BUBBLE.display.setState('offline'); });
   }
 
+  var listenersBound = false;
+
   function startWithPlayer(pid) {
     currentPlayer = pid;
     BUBBLE.display.setPlayer(pid);
 
     resync().then(function () {
-      if (!BUBBLE.cometdClient.init(pid)) { return; }
+      if (!listenersBound) {
+        listenersBound = true;
+        BUBBLE.cometdClient.on('status', function (data) {
+          if (data && data.mode !== undefined) { BUBBLE.display.update(data, pid); }
+        });
+        BUBBLE.cometdClient.on('offline', function () { BUBBLE.display.setState('offline'); });
+        BUBBLE.cometdClient.on('online', function () { resync(); }); // re-sincronizar al volver
+      }
 
-      BUBBLE.cometdClient.on('status', function (data) {
-        if (data && data.mode !== undefined) { BUBBLE.display.update(data, pid); }
-      });
-      BUBBLE.cometdClient.on('offline', function () { BUBBLE.display.setState('offline'); });
-      BUBBLE.cometdClient.on('online', function () { resync(); }); // re-sincronizar al volver
+      if (!BUBBLE.cometdClient.init(pid)) {
+        // lib ausente o init falló: reintento silencioso
+        setTimeout(function () { startWithPlayer(pid); }, SERVER_RETRY_MS);
+      }
     });
   }
 
