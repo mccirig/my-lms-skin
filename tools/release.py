@@ -24,6 +24,7 @@ import argparse
 import hashlib
 import re
 import sys
+import time
 import zipfile
 from pathlib import Path
 
@@ -56,8 +57,16 @@ def set_install_xml_version(version):
 
 
 def create_zip(version):
-    """Zip determinista: entradas ordenadas, sin metadatos de fecha/hora,
-    compression level fijo. Mismo contenido -> mismo SHA-1."""
+    """Zip con entradas ordenadas y compresion fija.
+
+    Las fechas de las entradas son las REALES del momento de la release:
+    LMS compila las plantillas Template Toolkit y las cachea en disco
+    (<cachedir>/templates) invalidando por mtime del archivo fuente. Si dos
+    versiones comparten mtime, LMS sirve la plantilla compilada anterior
+    (nos paso: zips deterministicos con fecha fija 1980 → caché stale).
+    El SHA-1 se calcula sobre ESTE zip, que es el que se commitea en dist/
+    y el que el workflow publica: no se reconstruye nunca en CI, asi que
+    la reproducibilidad entre maquinas no es necesaria."""
     DIST_DIR.mkdir(exist_ok=True)
     zip_path = DIST_DIR / f"bubbleskin-{version}.zip"
 
@@ -68,11 +77,13 @@ def create_zip(version):
     if not files:
         error(f"No hay archivos en {PLUGIN_DIR}")
 
+    build_time = time.localtime()[:6]  # (Y, M, D, h, m, s) reales de la release
+
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
         for path in files:
             rel = path.relative_to(PLUGIN_DIR).as_posix()
             arcname = f"{PLUGIN_NAME}/{rel}"
-            zinfo = zipfile.ZipInfo(arcname, date_time=(1980, 1, 1, 0, 0, 0))
+            zinfo = zipfile.ZipInfo(arcname, date_time=build_time)
             zinfo.compress_type = zipfile.ZIP_DEFLATED
             zinfo.external_attr = 0o100644 << 16  # archivo normal, rw-r--r--
             zf.writestr(zinfo, path.read_bytes())
