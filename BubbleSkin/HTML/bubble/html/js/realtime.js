@@ -51,7 +51,8 @@ BUBBLE.cometdClient = (function () {
     try {
       // maxBackoff es un campo de configuración (máx. 10 s entre reintentos);
       // init(config) = configure() + handshake()
-      cometd.init({ url: '/cometd', logLevel: 'off', maxBackoff: 10000 });
+      // websocketEnabled: false → LMS no expone WebSocket en /cometd, forzamos long-polling
+      cometd.init({ url: '/cometd', logLevel: 'off', maxBackoff: 10000, websocketEnabled: false });
     } catch (e) {
       console.error('[bubbleskin] fallo al iniciar cometd', e);
       emit('offline');
