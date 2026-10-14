@@ -2,14 +2,18 @@
   "nothing_playing": "Nothing playing",
   "paused": "Paused",
   "coming_up": "Coming up",
+  "nothing_next": "Nothing up next",
   "no_player": "Player not found",
   "no_player_available": "Player not available",
   "no_connection": "No connection to server",
+  "by": "by",
+  "from": "from",
   "local": "Local",
   "remote": "Remote",
   "kbps": "kbps",
   "khz": "kHz",
   "bit": "-bit",
   "unknown_album": "Unknown album",
-  "unknown_artist": "Unknown artist"
+  "unknown_artist": "Unknown artist",
+  "of": "of"
 }

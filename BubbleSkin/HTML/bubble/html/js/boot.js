@@ -59,7 +59,15 @@
     if (!currentPlayer) return Promise.resolve();
     return BUBBLE.lms.getPlayerStatus(currentPlayer)
       .then(function (res) { BUBBLE.display.update(res, currentPlayer); })
-      .catch(function () { BUBBLE.display.setState('offline'); });
+      .catch(function () { BUBBLE.display.setConnected(false); });
+  }
+
+  function updateOrientationClass() {
+    var np = document.getElementById('np');
+    if (!np) return;
+    var isHorizontal = window.innerWidth > window.innerHeight;
+    np.classList.toggle('orientation-horizontal', isHorizontal);
+    np.classList.toggle('orientation-vertical', !isHorizontal);
   }
 
   var listenersBound = false;
@@ -76,7 +84,7 @@
           console.log('[bubble] status event mode=', data && data.mode, 'keys=', data ? Object.keys(data).join(',') : '-');
           if (data && data.mode !== undefined) { BUBBLE.display.update(data, pid); }
         });
-        BUBBLE.cometdClient.on('offline', function () { console.log('[bubble] offline event'); BUBBLE.display.setState('offline'); });
+        BUBBLE.cometdClient.on('offline', function () { console.log('[bubble] offline event'); BUBBLE.display.setConnected(false); });
         BUBBLE.cometdClient.on('online', function () { console.log('[bubble] online event'); resync(); }); // re-sincronizar al volver
       }
 
@@ -90,6 +98,7 @@
 
   function boot() {
     BUBBLE.display.setState('loading');
+    updateOrientationClass();
 
     chooseLanguage()
       .then(loadI18n)
@@ -107,10 +116,12 @@
       })
       .catch(function () {
         // servidor inalcanzable → estado Offline y reintento silencioso
-        BUBBLE.display.setState('offline');
+        BUBBLE.display.setConnected(false);
         setTimeout(boot, SERVER_RETRY_MS);
       });
   }
 
   document.addEventListener('DOMContentLoaded', boot);
+  window.addEventListener('resize', updateOrientationClass);
+  window.addEventListener('orientationchange', updateOrientationClass);
 })();

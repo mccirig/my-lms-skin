@@ -1,16 +1,19 @@
 /* display.css — BubbleSkin now-playing kiosk display.
- * Dos familias de layout (FR-016):
- *   - horizontal (referencia 16:9): carátula a la izquierda grande (≥ 40% alto visible)
- *   - vertical (alto >= ancho; 9:16, 3:4…): carátula arriba a todo ancho con márgenes,
+ * Paleta unificada vertical/horizontal (FR-002).
+ * Dos familias de layout:
+ *   - horizontal (referencia 16:9): carátula a la izquierda grande
+ *   - vertical (alto >= ancho; 9:16, 3:4…): carátula arriba adaptativa,
  *     metadatos debajo, progreso después, bloque de estado inferior
- * Solo lectura (FR-013): sin elementos interactivos. Legible a 2-3 m (SC-002). */
+ * Solo lectura: sin elementos interactivos. */
 
 :root {
-  --bg: #0b1120;
-  --fg: #e2e8f0;
-  --muted: #94a3b8;
-  --accent: #3b82f6;
-  --safe: 3vmin;          /* márgenes de seguridad del viewport */
+  --bg-page: #252f3c;
+  --text-primary: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.5);
+  --progress-fill: #4e8dca;
+  --progress-bg: #3a4046;
+  --status-bg: #263036;
+  --safe: 3vmin;
 }
 
 * { box-sizing: border-box; }
@@ -19,13 +22,17 @@ html, body { height: 100%; }
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: "Roboto", system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   overflow: hidden;
 }
 
-/* ---------- ticker (FR-012) ---------- */
+/* ---------- utilidades ---------- */
+
+.np-dim { color: var(--text-dim); }
+
+/* ---------- ticker ---------- */
 
 .ticker-target { overflow: hidden; white-space: nowrap; }
 .ticker-target > span { display: inline-block; will-change: transform; }
@@ -46,29 +53,32 @@ body {
   align-items: flex-start;
   justify-content: center;
   min-height: 0;
+  max-height: 60vh;
+  flex: 0 0 auto;
 }
 
 .np-cover img {
-  width: 100%;                       /* ancho del viewport (menos márgenes, FR-016) */
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  max-height: 60vh;
+  object-fit: contain;
   border-radius: 2vmin;
-  background: #1e293b;
+  background: var(--status-bg);
 }
 
 .np-meta { display: flex; flex-direction: column; gap: 1.5vmin; min-height: 0; }
 
 .np-title { margin: 0; font-size: 7.5vmin; font-weight: 700; line-height: 1.15; }
-.np-artist { font-size: 4.2vmin; color: var(--fg); }
-.np-album { font-size: 3.4vmin; color: var(--muted); }
-.np-tech { font-size: 2.6vmin; color: var(--muted); letter-spacing: 0.02em; }
+.np-artist { font-size: 4.2vmin; }
+.np-album { font-size: 3.4vmin; }
+.np-tech { font-size: 2.6vmin; letter-spacing: 0.02em; }
 
 .np-progress { margin-top: 2vmin; }
 
 .np-progress-bar {
   height: 1.4vmin;
   min-height: 8px;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--progress-bg);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -76,39 +86,58 @@ body {
 .np-progress-fill {
   height: 100%;
   width: 0;
-  background: var(--accent);
+  background: var(--progress-fill);
   transition: width 0.9s linear;
 }
 
-.np-progress--noduration .np-progress-bar { visibility: hidden; } /* streams (FR-005) */
+.np-progress--noduration .np-progress-bar { visibility: hidden; }
 
 .np-progress-times {
   display: flex;
   justify-content: space-between;
   font-size: 2.8vmin;
-  color: var(--muted);
   margin-top: 0.8vmin;
   font-variant-numeric: tabular-nums;
 }
 
-.np-status { margin-top: auto; }
+.np-status {
+  margin-top: auto;
+  padding: 1.8vmin;
+  background: var(--status-bg);
+  border-radius: 1.5vmin;
+}
+
+.np-status-title {
+  font-size: 2.4vmin;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.2vmin;
+}
+
+.np-status-body { min-height: 0; }
 
 .np-comingup {
   display: flex;
   align-items: center;
   gap: 2vmin;
-  padding: 1.8vmin;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 1.5vmin;
 }
 
-.np-coming-label { font-size: 2.4vmin; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-.np-coming-cover { width: 14vmin; height: 14vmin; max-width: 96px; max-height: 96px; object-fit: cover; border-radius: 1vmin; background: #1e293b; }
+.np-coming-cover {
+  width: 14vmin;
+  height: 14vmin;
+  max-width: 96px;
+  max-height: 96px;
+  object-fit: cover;
+  border-radius: 1vmin;
+  background: var(--bg-page);
+  flex: 0 0 auto;
+}
+
 .np-coming-meta { min-width: 0; flex: 1; }
 .np-coming-title { font-size: 3vmin; font-weight: 600; }
-.np-coming-artist { font-size: 2.4vmin; color: var(--muted); }
+.np-coming-artist { font-size: 2.4vmin; }
 
-/* ---------- estados de la máquina (data-model.md) ---------- */
+/* ---------- estados de la máquina ---------- */
 
 .np-statemsg { display: none; }
 
@@ -127,18 +156,16 @@ body:not([data-state="playing"]):not([data-state="paused"]) .np-statemsg {
   display: block;
   font-size: 6vmin;
   font-weight: 600;
-  color: var(--muted);
   text-align: center;
 }
 
-/* indicación visual de pausa (FR-010): chip discreto + progreso atenuado */
+/* indicación visual de pausa: chip discreto + progreso atenuado */
 body[data-state="paused"] .np-statemsg {
   display: inline-block;
   position: fixed;
   right: var(--safe);
   top: var(--safe);
   font-size: 2.6vmin;
-  color: var(--fg);
   background: rgba(255, 255, 255, 0.1);
   padding: 0.8vmin 2vmin;
   border-radius: 999px;
@@ -159,11 +186,11 @@ body[data-state="paused"] .np-progress { opacity: 0.55; }
     align-items: stretch;
   }
 
-  .np-cover { grid-area: cover; align-items: center; padding-right: calc(var(--safe) * 1.2); }
+  .np-cover { grid-area: cover; align-items: center; padding-right: calc(var(--safe) * 1.2); max-height: none; }
 
   .np-cover img {
     width: auto;
-    height: 72vh;                    /* ≥ 40% del alto visible (FR-001), prominente */
+    height: 72vh;
     max-height: calc(100vh - 2 * var(--safe));
     max-width: 100%;
     margin: 0 auto;

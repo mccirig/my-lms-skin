@@ -25,3 +25,31 @@ PLUGIN_BUBBLE_SKIN_ACCENT_COLOR
 PLUGIN_BUBBLE_SKIN_ACCENT_COLOR_DESC
 	EN	CSS color used for buttons and highlights (e.g. #3b82f6).
 	ES	Color CSS usado en botones y destacados (p. ej. #3b82f6).
+
+BUBBLESKIN_BY
+	EN	by
+	ES	por
+
+BUBBLESKIN_FROM
+	EN	from
+	ES	de
+
+BUBBLESKIN_COMING_UP
+	EN	Coming up
+	ES	A continuación
+
+BUBBLESKIN_NOTHING_NEXT
+	EN	Nothing up next
+	ES	Nada que reproducir
+
+BUBBLESKIN_NO_CONNECTION
+	EN	No connection to server
+	ES	Sin conexión con el servidor
+
+BUBBLESKIN_NOTHING_PLAYING
+	EN	Nothing playing
+	ES	Nada en reproducción
+
+BUBBLESKIN_OF
+	EN	of
+	ES	de

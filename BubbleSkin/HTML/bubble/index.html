@@ -4,48 +4,42 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>[% "BUBBLE_SKIN" | string %]</title>
-  <link rel="stylesheet" href="[% webroot %]html/css/display.css?v=0.1.8">
+  <link rel="stylesheet" href="[% webroot %]html/css/display.css?v=0.2.0">
 </head>
 <body data-state="loading">
 
-<main id="np" class="np">
-  <section class="np-cover">
-    <img id="cover" src="[% webroot %]html/images/cover-placeholder.svg" alt="">
+<main id="np" class="np orientation-vertical">
+  <section class="np-cover-area np-cover">
+    <img id="cover" class="np-cover" src="[% webroot %]html/images/cover-placeholder.svg" alt="">
   </section>
 
-  <section class="np-meta">
+  <section class="np-metadata np-meta">
     <h1 id="title" class="np-title ticker-target"><span></span></h1>
-    <div id="artist" class="np-artist ticker-target"><span></span></div>
-    <div id="album" class="np-album ticker-target"><span></span></div>
-    <div id="tech" class="np-tech ticker-target"><span></span></div>
-
-    <div id="progress" class="np-progress">
-      <div class="np-progress-bar"><div id="progress-fill" class="np-progress-fill"></div></div>
-      <div class="np-progress-times">
-        <span id="time-elapsed"></span>
-        <span id="time-total"></span>
-      </div>
-    </div>
+    <div id="artist" class="np-artist np-dim ticker-target"><span></span></div>
+    <div id="album" class="np-album np-dim ticker-target"><span></span></div>
+    <div id="tech" class="np-tech np-dim ticker-target"><span></span></div>
   </section>
+
+  <div id="progress" class="np-progress">
+    <div class="np-progress-bar"><div id="progress-fill" class="np-progress-fill"></div></div>
+    <div class="np-progress-times">
+      <span id="time-elapsed" class="np-dim"></span>
+      <span id="time-total" class="np-dim"></span>
+    </div>
+  </div>
 
   <footer class="np-status">
-    <div id="coming-up" class="np-comingup">
-      <span id="coming-label" class="np-coming-label"></span>
-      <img id="coming-cover" class="np-coming-cover" src="" alt="">
-      <div class="np-coming-meta">
-        <div id="coming-title" class="np-coming-title ticker-target"><span></span></div>
-        <div id="coming-artist" class="np-coming-artist ticker-target"><span></span></div>
-      </div>
-    </div>
+    <div id="status-title" class="np-status-title np-dim"></div>
+    <div id="status-body" class="np-status-body"></div>
     <div id="state-msg" class="np-statemsg"></div>
   </footer>
 </main>
 
-  <script src="[% webroot %]html/lib/libcometd.min.js?v=0.1.8"></script>
-  <script src="[% webroot %]html/js/lms.js?v=0.1.8"></script>
-  <script src="[% webroot %]html/js/realtime.js?v=0.1.8"></script>
-  <script src="[% webroot %]html/js/ticker.js?v=0.1.8"></script>
-  <script src="[% webroot %]html/js/display.js?v=0.1.8"></script>
-  <script src="[% webroot %]html/js/boot.js?v=0.1.8"></script>
+  <script src="[% webroot %]html/lib/libcometd.min.js?v=0.2.0"></script>
+  <script src="[% webroot %]html/js/lms.js?v=0.2.0"></script>
+  <script src="[% webroot %]html/js/realtime.js?v=0.2.0"></script>
+  <script src="[% webroot %]html/js/ticker.js?v=0.2.0"></script>
+  <script src="[% webroot %]html/js/display.js?v=0.2.0"></script>
+  <script src="[% webroot %]html/js/boot.js?v=0.2.0"></script>
 </body>
 </html>

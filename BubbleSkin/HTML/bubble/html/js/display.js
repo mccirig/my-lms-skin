@@ -19,7 +19,7 @@ BUBBLE.display = (function () {
   var progressTimer = null;
   var lastTrackKey = null;
 
-  var TICKER_FIELDS = ['title', 'artist', 'album', 'tech', 'coming-title', 'coming-artist'];
+  var TICKER_FIELDS = ['title', 'artist', 'album', 'tech', 'status-title', 'coming-title', 'coming-artist'];
 
   function qs(id) { return document.getElementById(id); }
   function t(key) { return dict[key] || key; }
@@ -30,8 +30,8 @@ BUBBLE.display = (function () {
     dict = i18nDict || {};
 
     ['cover', 'title', 'artist', 'album', 'tech', 'progress', 'progress-fill',
-     'time-elapsed', 'time-total', 'coming-up', 'coming-label', 'coming-cover',
-     'coming-title', 'coming-artist', 'state-msg']
+     'time-elapsed', 'time-total', 'status', 'status-title', 'status-body',
+     'state-msg']
       .forEach(function (id) { E[id] = qs(id); });
 
     TICKER_FIELDS.forEach(function (id) {
@@ -43,10 +43,6 @@ BUBBLE.display = (function () {
       E['cover'].src = 'html/images/cover-placeholder.svg';
       E['cover'].onerror = null; // placeholder: sin bucle
     };
-    E['coming-cover'].onerror = function () {
-      E['coming-cover'].src = 'html/images/cover-placeholder.svg';
-      E['coming-cover'].onerror = null;
-    };
 
     // Re-medición de tickers al rotar/redimensionar (families H/V cambian anchos)
     window.addEventListener('resize', function () {
@@ -57,11 +53,11 @@ BUBBLE.display = (function () {
   function setState(name, msgKey) {
     state = name;
     document.body.setAttribute('data-state', name);
-    if (!E['state-msg']) { return; } // aún no hecho bind(): solo marca el estado
+    if (!E['state-msg']) { return; }
     if (name === 'noplayer') E['state-msg'].textContent = t(msgKey || 'no_player');
     else if (name === 'offline') E['state-msg'].textContent = t('no_connection');
     else if (name === 'nothing') E['state-msg'].textContent = t('nothing_playing');
-    else if (name === 'paused') E['state-msg'].textContent = t('paused'); // chip de pausa (FR-010)
+    else if (name === 'paused') E['state-msg'].textContent = t('paused');
     else E['state-msg'].textContent = '';
   }
 
@@ -71,8 +67,6 @@ BUBBLE.display = (function () {
   }
 
   function setPlayer(pid) { playerId = pid; }
-
-  /* ---------------- formato ---------------- */
 
   function fmtTime(secs) {
     secs = Math.max(0, Math.floor(secs || 0));
@@ -101,35 +95,97 @@ BUBBLE.display = (function () {
     E['cover'].src = url;
   }
 
+  function formatMetadata(track) {
+    var sep = ' \u00b7 '; // punto medio con espacios
+    var lines = {};
+
+    var titleParts = [];
+    if (track.tracknum) { titleParts.push(String(track.tracknum)); }
+    if (track.title) { titleParts.push(track.title); }
+    lines.title = titleParts.join(sep);
+
+    lines.artist = track.artist ? t('by') + ' ' + track.artist : '';
+
+    var albumParts = [];
+    if (track.album) { albumParts.push(track.album); }
+    if (track.year) { albumParts.push('(' + track.year + ')'); }
+    lines.album = albumParts.length ? t('from') + ' ' + albumParts.join(' ') : '';
+
+    return lines;
+  }
+
+  function renderMetadata(track) {
+    var lines = formatMetadata(track);
+    setText('title', lines.title);
+    setText('artist', lines.artist || t('unknown_artist'));
+    setText('album', lines.album || t('unknown_album'));
+  }
+
   function renderTech(track) {
     var parts = [];
     if (track.type) parts.push(String(track.type).toUpperCase());
     if (track.bitrate) parts.push(String(track.bitrate));
     if (track.samplerate) parts.push(fmtSampleRate(track.samplerate));
     if (track.samplesize) parts.push(String(track.samplesize) + t('bit'));
-    parts.push(track.remote ? t('remote') : t('local'));
-    setText('tech', parts.join(' · ')); // campos ausentes → omitidos (FR-003)
+    // posición en playlist "N de M" si hay datos
+    var idx = Number(track.playlist_index);
+    var total = Number(track.playlist_total);
+    if (!isNaN(idx) && !isNaN(total) && total > 0) {
+      parts.push((idx + 1) + ' ' + t('of') + ' ' + total);
+    }
+    setText('tech', parts.join(' \u00b7 '));
   }
 
-  function renderComingUp(next) {
-    if (!next) { E['coming-up'].style.display = 'none'; return; }
+  function renderProgress() {
+    var hasDuration = !!duration;
+    E['progress'].classList.toggle('np-progress--noduration', !hasDuration);
 
-    E['coming-up'].style.display = '';
-    E['coming-label'].textContent = t('coming_up');
-    setText('coming-title', next.title || '');
-    setText('coming-artist', next.artist || '');
+    var elapsed = currentElapsed();
+    E['time-elapsed'].textContent = fmtTime(elapsed);
+    E['time-total'].textContent = hasDuration ? fmtTime(duration) : '';
 
-    var cover = 'html/images/cover-placeholder.svg';
-    if (next.artwork_track_id) {
-      cover = '/music/' + next.artwork_track_id + '/cover_300x300_f.jpg';
-    } else if (next.artwork_url) {
-      cover = next.artwork_url; // ya viene proxied por el servidor (tag K)
+    var pct = hasDuration ? Math.min(100, (elapsed / duration) * 100) : 0;
+    E['progress-fill'].style.width = pct + '%';
+  }
+
+  function renderStatus(status) {
+    // status = { mode: 'playing-next'|'playing-last'|'stopped'|'disconnected', next: NextTrack|null }
+    var titleKey = '';
+    var bodyHtml = '';
+
+    if (!status || status.mode === 'disconnected') {
+      titleKey = 'no_connection';
+    } else if (status.mode === 'stopped') {
+      titleKey = 'nothing_playing';
+    } else if (status.mode === 'playing-last') {
+      titleKey = 'nothing_next';
+    } else {
+      titleKey = 'coming_up';
     }
-    E['coming-cover'].onerror = function () {
-      E['coming-cover'].src = 'html/images/cover-placeholder.svg';
-      E['coming-cover'].onerror = null;
-    };
-    E['coming-cover'].src = cover;
+
+    E['status-title'].textContent = t(titleKey);
+
+    if (status && status.mode === 'playing-next' && status.next) {
+      var next = status.next;
+      var cover = 'html/images/cover-placeholder.svg';
+      if (next.artwork_track_id) {
+        cover = '/music/' + next.artwork_track_id + '/cover_300x300_f.jpg';
+      } else if (next.artwork_url) {
+        cover = next.artwork_url;
+      }
+      bodyHtml = '<img class="np-coming-cover" src="' + escapeHtml(cover) + '" alt="" onerror="this.src=\'html/images/cover-placeholder.svg\';this.onerror=null;">' +
+                 '<div class="np-coming-meta">' +
+                   '<div class="np-coming-title">' + escapeHtml(next.title || '') + '</div>' +
+                   '<div class="np-coming-artist np-dim">' + escapeHtml(next.artist || '') + '</div>' +
+                 '</div>';
+      E['status-body'].innerHTML = '<div class="np-comingup">' + bodyHtml + '</div>';
+    } else {
+      E['status-body'].innerHTML = '';
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
   /* ---------------- progreso ---------------- */
@@ -179,6 +235,7 @@ BUBBLE.display = (function () {
       stopClock();
       lastTrackKey = null;
       setState('nothing');
+      renderStatus({ mode: 'stopped' });
       return;
     }
 
@@ -191,21 +248,18 @@ BUBBLE.display = (function () {
 
     if (trackChanged) {
       renderCover(trackKey);
-      setText('title', now.title || '');
-      setText('artist', now.artist || t('unknown_artist'));
-      setText('album', now.album || t('unknown_album'));
+      renderMetadata(now);
     }
     renderTech(now);
 
     duration = now.duration ? Number(now.duration) : null;
-    updateProgress();
+    renderProgress();
     if (mode === 'play') { startClock(); } else { stopClock(); }
 
-    renderComingUp(next);
+    var statusMode = next ? 'playing-next' : 'playing-last';
+    renderStatus({ mode: statusMode, next: next });
 
     // Re-medir tickers solo cuando hay cambio de pista O cambio de estado
-    // (p. ej. volver de "nothing": los campos se midieron estando ocultos).
-    // Nunca en heartbeats rutinarios: refresh() resetea la posición a inicio.
     if (trackChanged || prevState !== state) {
       TICKER_FIELDS.forEach(function (id) { tickers[id].refresh(); });
     }
@@ -214,6 +268,7 @@ BUBBLE.display = (function () {
   return {
     bind: bind,
     setState: setState,
+    setConnected: setConnected,
     setPlayer: setPlayer,
     update: update
   };
