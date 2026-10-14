@@ -27,8 +27,12 @@ BUBBLE.cometdClient = (function () {
 
   function subscribePlayerStatus() {
     var clid = cometd.getClientId();
+    console.log('[bubble] clientId =', clid, 'playerId =', playerId);
     // catch-all: todos los mensajes dirigidos a este cliente
-    cometd.subscribe('/' + clid + '/**', function (message) { emit('status', message.data); });
+    cometd.subscribe('/' + clid + '/**', function (message) {
+      console.log('[bubble] raw message', message.channel, message.data ? Object.keys(message.data).join(',') : '-');
+      emit('status', message.data);
+    });
     // suscripción al estado del reproductor (el canal response DEBE contener el clid)
     cometd.subscribe('/slim/subscribe', function () {}, {
       data: {

@@ -71,13 +71,16 @@
     resync().then(function () {
       if (!listenersBound) {
         listenersBound = true;
+        console.log('[bubble] binding cometd listeners');
         BUBBLE.cometdClient.on('status', function (data) {
+          console.log('[bubble] status event mode=', data && data.mode, 'keys=', data ? Object.keys(data).join(',') : '-');
           if (data && data.mode !== undefined) { BUBBLE.display.update(data, pid); }
         });
-        BUBBLE.cometdClient.on('offline', function () { BUBBLE.display.setState('offline'); });
-        BUBBLE.cometdClient.on('online', function () { resync(); }); // re-sincronizar al volver
+        BUBBLE.cometdClient.on('offline', function () { console.log('[bubble] offline event'); BUBBLE.display.setState('offline'); });
+        BUBBLE.cometdClient.on('online', function () { console.log('[bubble] online event'); resync(); }); // re-sincronizar al volver
       }
 
+      console.log('[bubble] init cometd for player', pid);
       if (!BUBBLE.cometdClient.init(pid)) {
         // lib ausente o init falló: reintento silencioso
         setTimeout(function () { startWithPlayer(pid); }, SERVER_RETRY_MS);
