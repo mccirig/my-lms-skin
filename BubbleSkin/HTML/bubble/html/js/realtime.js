@@ -33,12 +33,10 @@ BUBBLE.cometdClient = (function () {
       console.log('[bubble] raw message', message.channel, message.data ? Object.keys(message.data).join(',') : '-');
       emit('status', message.data);
     });
-    // suscripción al estado del reproductor (el canal response DEBE contener el clid)
-    cometd.subscribe('/slim/subscribe', function () {}, {
-      data: {
-        response: '/' + clid + '/slim/playerstatus/' + playerId,
-        request: [playerId, ['status', '-', 2, 'tags:' + STATUS_TAGS, 'subscribe:' + SUBSCRIBE_SECS]]
-      }
+    // petición de suscripción al estado del reproductor (enviar a /slim/subscribe, no /meta/subscribe)
+    cometd.publish('/slim/subscribe', {
+      response: '/' + clid + '/slim/playerstatus/' + playerId,
+      request: [playerId, ['status', '-', 2, 'tags:' + STATUS_TAGS, 'subscribe:' + SUBSCRIBE_SECS]]
     });
   }
 

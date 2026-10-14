@@ -4,15 +4,15 @@
     <title lang="EN">Bubble Skin Repository</title>
   </details>
   <plugins>
-    <plugin name="BubbleSkin" version="0.1.6" minTarget="8.0" maxTarget="*">
+    <plugin name="BubbleSkin" version="0.1.7" minTarget="8.0" maxTarget="*">
       <title lang="EN">Bubble Skin</title>
       <desc lang="EN">Example SPA skin for LMS (Lyrion Music Server).</desc>
       <desc lang="ES">Skin SPA de ejemplo para LMS (Lyrion Music Server).</desc>
       <category>skin</category>
       <creator>my-lms-skin</creator>
       <link>https://github.com/mccirig/my-lms-skin</link>
-      <url>https://github.com/mccirig/my-lms-skin/releases/download/v0.1.6/bubbleskin-0.1.6.zip</url>
-      <sha>41ebac2ba0ed38fc1e1b0f3e869abc95519c1a25</sha>
+      <url>https://github.com/mccirig/my-lms-skin/releases/download/v0.1.7/bubbleskin-0.1.7.zip</url>
+      <sha>123a8399a2ee93699a627e3808bb839d1864c2b5</sha>
     </plugin>
   </plugins>
 </extensions>
