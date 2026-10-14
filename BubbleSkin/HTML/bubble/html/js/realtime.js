@@ -52,11 +52,15 @@ BUBBLE.cometdClient = (function () {
     }
 
     cometd = new org.cometd.CometD();
+    // LMS no soporta WebSocket en /cometd; lo sacamos de la lista de transports
+    cometd.unregisterTransport('websocket');
     try {
-      // maxBackoff es un campo de configuración (máx. 10 s entre reintentos);
       // init(config) = configure() + handshake()
-      // websocketEnabled: false → LMS no expone WebSocket en /cometd, forzamos long-polling
-      cometd.init({ url: '/cometd', logLevel: 'off', maxBackoff: 10000, websocketEnabled: false });
+      // appendMessageTypeToURL: false → todos los POST van a /cometd (igual que la sonda)
+      cometd.init(
+        { url: '/cometd', logLevel: 'off', maxBackoff: 10000, appendMessageTypeToURL: false },
+        { supportedConnectionTypes: ['long-polling'] }
+      );
     } catch (e) {
       console.error('[bubbleskin] fallo al iniciar cometd', e);
       emit('offline');
