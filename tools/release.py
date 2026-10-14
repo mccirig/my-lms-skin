@@ -56,6 +56,19 @@ def set_install_xml_version(version):
     info(f"install.xml -> version {version}")
 
 
+INDEX_HTML = PLUGIN_DIR / "HTML" / "bubble" / "index.html"
+
+
+def set_cache_busting_version(version):
+    """Actualiza ?v=... en los assets de index.html para forzar recarga en navegadores."""
+    text = INDEX_HTML.read_text(encoding="utf-8")
+    new, count = re.subn(r"\?v=[^\"'\?]+", f"?v={version}", text)
+    if count == 0:
+        error(f"No se encontraron query strings ?v= en {INDEX_HTML}")
+    INDEX_HTML.write_text(new, encoding="utf-8")
+    info(f"index.html -> cache-busting ?v={version} ({count} assets)")
+
+
 def create_zip(version):
     """Zip con entradas ordenadas y compresion fija.
 
@@ -146,6 +159,7 @@ def main():
     zip_url = f"{args.repo}/releases/download/{tag}/{zip_name}"
 
     set_install_xml_version(version)
+    set_cache_busting_version(version)
     zip_path = create_zip(version)
     sha1 = sha1_of(zip_path)
     info(f"SHA-1: {sha1}")
