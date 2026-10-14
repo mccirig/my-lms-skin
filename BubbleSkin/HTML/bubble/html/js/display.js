@@ -68,6 +68,14 @@ BUBBLE.display = (function () {
 
   function setPlayer(pid) { playerId = pid; }
 
+  function setConnected(connected) {
+    if (!connected) {
+      stopClock();
+      setState('offline');
+      renderStatus({ mode: 'disconnected' });
+    }
+  }
+
   function fmtTime(secs) {
     secs = Math.max(0, Math.floor(secs || 0));
     var h = Math.floor(secs / 3600);
@@ -179,6 +187,9 @@ BUBBLE.display = (function () {
                    '<div class="np-coming-artist np-dim">' + escapeHtml(next.artist || '') + '</div>' +
                  '</div>';
       E['status-body'].innerHTML = '<div class="np-comingup">' + bodyHtml + '</div>';
+      // Medir tickers del contenido dinámico recién insertado
+      if (tickers['coming-title']) { tickers['coming-title'].refresh(); }
+      if (tickers['coming-artist']) { tickers['coming-artist'].refresh(); }
     } else {
       E['status-body'].innerHTML = '';
     }

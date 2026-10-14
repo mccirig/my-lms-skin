@@ -5,7 +5,7 @@
   <description>PLUGIN_BUBBLE_SKIN</description>
   <creator>my-lms-skin</creator>
   <icon>plugins/BubbleSkin/html/images/icon.svg</icon>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   <defaultState>enabled</defaultState>
   <type>2</type>
   <targetApplication>
