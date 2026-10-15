@@ -31,22 +31,28 @@ BUBBLE.display = (function () {
 
     ['cover', 'title', 'artist', 'album', 'tech', 'progress', 'progress-fill',
      'time-elapsed', 'time-total', 'status', 'status-title', 'status-body',
-     'state-msg']
+     'coming-up', 'coming-cover', 'coming-title', 'coming-artist', 'state-msg']
       .forEach(function (id) { E[id] = qs(id); });
 
     TICKER_FIELDS.forEach(function (id) {
+      if (!E[id]) { return; }
       var target = E[id].closest('.ticker-target') || E[id];
       tickers[id] = BUBBLE.createTicker(target);
     });
 
     E['cover'].onerror = function () {
       E['cover'].src = 'html/images/cover-placeholder.svg';
-      E['cover'].onerror = null; // placeholder: sin bucle
+      E['cover'].onerror = null;
+    };
+    E['coming-cover'].onerror = function () {
+      E['coming-cover'].src = 'html/images/cover-placeholder.svg';
+      E['coming-cover'].onerror = null;
     };
 
-    // Re-medición de tickers al rotar/redimensionar (families H/V cambian anchos)
     window.addEventListener('resize', function () {
-      TICKER_FIELDS.forEach(function (id) { tickers[id].refresh(); });
+      Object.keys(tickers).forEach(function (id) {
+        if (tickers[id]) { tickers[id].refresh(); }
+      });
     });
   }
 
@@ -159,7 +165,6 @@ BUBBLE.display = (function () {
   function renderStatus(status) {
     // status = { mode: 'playing-next'|'playing-last'|'stopped'|'disconnected', next: NextTrack|null }
     var titleKey = '';
-    var bodyHtml = '';
 
     if (!status || status.mode === 'disconnected') {
       titleKey = 'no_connection';
@@ -174,25 +179,30 @@ BUBBLE.display = (function () {
     E['status-title'].textContent = t(titleKey);
 
     if (status && status.mode === 'playing-next' && status.next) {
-      var next = status.next;
-      var cover = 'html/images/cover-placeholder.svg';
-      if (next.artwork_track_id) {
-        cover = '/music/' + next.artwork_track_id + '/cover_300x300_f.jpg';
-      } else if (next.artwork_url) {
-        cover = next.artwork_url;
-      }
-      bodyHtml = '<img class="np-coming-cover" src="' + escapeHtml(cover) + '" alt="" onerror="this.src=\'html/images/cover-placeholder.svg\';this.onerror=null;">' +
-                 '<div class="np-coming-meta">' +
-                   '<div class="np-coming-title">' + escapeHtml(next.title || '') + '</div>' +
-                   '<div class="np-coming-artist np-dim">' + escapeHtml(next.artist || '') + '</div>' +
-                 '</div>';
-      E['status-body'].innerHTML = '<div class="np-comingup">' + bodyHtml + '</div>';
-      // Medir tickers del contenido dinámico recién insertado
-      if (tickers['coming-title']) { tickers['coming-title'].refresh(); }
-      if (tickers['coming-artist']) { tickers['coming-artist'].refresh(); }
+      renderComingUp(status.next);
     } else {
-      E['status-body'].innerHTML = '';
+      if (E['coming-up']) { E['coming-up'].style.display = 'none'; }
     }
+  }
+
+  function renderComingUp(next) {
+    if (!next || !E['coming-up']) { return; }
+
+    E['coming-up'].style.display = '';
+    setText('coming-title', next.title || '');
+    setText('coming-artist', next.artist || '');
+
+    var cover = 'html/images/cover-placeholder.svg';
+    if (next.artwork_track_id) {
+      cover = '/music/' + next.artwork_track_id + '/cover_300x300_f.jpg';
+    } else if (next.artwork_url) {
+      cover = next.artwork_url;
+    }
+    E['coming-cover'].onerror = function () {
+      E['coming-cover'].src = 'html/images/cover-placeholder.svg';
+      E['coming-cover'].onerror = null;
+    };
+    E['coming-cover'].src = cover;
   }
 
   function escapeHtml(str) {
@@ -272,7 +282,7 @@ BUBBLE.display = (function () {
 
     // Re-medir tickers solo cuando hay cambio de pista O cambio de estado
     if (trackChanged || prevState !== state) {
-      TICKER_FIELDS.forEach(function (id) { tickers[id].refresh(); });
+      Object.keys(tickers).forEach(function (id) { if (tickers[id]) { tickers[id].refresh(); } });
     }
   }
 

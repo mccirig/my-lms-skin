@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>[% "BUBBLE_SKIN" | string %]</title>
-  <link rel="stylesheet" href="[% webroot %]html/css/display.css?v=0.2.1">
+  <link rel="stylesheet" href="[% webroot %]html/css/display.css?v=0.2.2">
 </head>
 <body data-state="loading">
 
@@ -30,16 +30,24 @@
 
   <footer class="np-status">
     <div id="status-title" class="np-status-title np-dim"></div>
-    <div id="status-body" class="np-status-body"></div>
+    <div id="status-body" class="np-status-body">
+      <div id="coming-up" class="np-comingup" style="display:none;">
+        <img id="coming-cover" class="np-coming-cover" src="" alt="">
+        <div class="np-coming-meta">
+          <div id="coming-title" class="np-coming-title ticker-target"><span></span></div>
+          <div id="coming-artist" class="np-coming-artist np-dim ticker-target"><span></span></div>
+        </div>
+      </div>
+    </div>
     <div id="state-msg" class="np-statemsg"></div>
   </footer>
 </main>
 
-  <script src="[% webroot %]html/lib/libcometd.min.js?v=0.2.1"></script>
-  <script src="[% webroot %]html/js/lms.js?v=0.2.1"></script>
-  <script src="[% webroot %]html/js/realtime.js?v=0.2.1"></script>
-  <script src="[% webroot %]html/js/ticker.js?v=0.2.1"></script>
-  <script src="[% webroot %]html/js/display.js?v=0.2.1"></script>
-  <script src="[% webroot %]html/js/boot.js?v=0.2.1"></script>
+  <script src="[% webroot %]html/lib/libcometd.min.js?v=0.2.2"></script>
+  <script src="[% webroot %]html/js/lms.js?v=0.2.2"></script>
+  <script src="[% webroot %]html/js/realtime.js?v=0.2.2"></script>
+  <script src="[% webroot %]html/js/ticker.js?v=0.2.2"></script>
+  <script src="[% webroot %]html/js/display.js?v=0.2.2"></script>
+  <script src="[% webroot %]html/js/boot.js?v=0.2.2"></script>
 </body>
 </html>
