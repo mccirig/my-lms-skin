@@ -189,7 +189,13 @@ BUBBLE.display = (function () {
     if (!next || !E['coming-up']) { return; }
 
     E['coming-up'].style.display = '';
-    setText('coming-title', next.title || '');
+
+    var sep = ' \u00b7 ';
+    var titleParts = [];
+    if (next.tracknum) { titleParts.push(String(next.tracknum)); }
+    if (next.title) { titleParts.push(next.title); }
+    setText('coming-title', titleParts.join(sep) || '');
+
     setText('coming-artist', next.artist || '');
 
     var cover = 'html/images/cover-placeholder.svg';
